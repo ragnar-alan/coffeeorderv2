@@ -1,27 +1,29 @@
-package eu.borostomi.mongodbdemo.documents;
+package eu.borostomi.mongodbdemo.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Document("coffees")
+import static com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @Data
 @NoArgsConstructor
-public class Coffee {
-    @Id
+@ToString
+@JsonInclude(Include.NON_NULL)
+public class CoffeeDto {
     private String id;
     private String name;
     private String aromaProfile;
     private String aromaNotes;
     private List<String> cupSize;
     private Integer tasteIntensity;
-    private List<Recipe> recipes;
-    private Boolean collection;
+    private RecipesDto recipe;
+    private Boolean isCollection;
     private BigDecimal price;
-    private Boolean orderable;
+    private Boolean isOrderable;
     private Boolean isDecaff;
 }

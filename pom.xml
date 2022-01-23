@@ -36,12 +36,18 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.digidemic</groupId>
+            <artifactId>unitof</artifactId>
+            <version>1.0.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/UnitOf.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
