@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class Ingredient {
     private String name;
-    private Integer amount;
+    private Double amount;
     private String unit;
     private Boolean replaceable;
 }

@@ -9,12 +9,22 @@ import eu.borostomi.mongodbdemo.dto.IngredientDto;
 import eu.borostomi.mongodbdemo.dto.RecipesDto;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Component
 public class CoffeeTransformator {
+
+    public static final String IMPERIAL = "imperial";
+    private TransformatorCommandProvider transformatorCommandProvider;
+
+    public CoffeeTransformator(TransformatorCommandProvider transformatorCommandProvider) {
+        this.transformatorCommandProvider = transformatorCommandProvider;
+    }
 
     public CoffeeDto convertCoffeeToDto(Coffee coffee, Recipe recipe, String measurement) {
         CoffeeDto dto = new CoffeeDto();
@@ -49,11 +59,17 @@ public class CoffeeTransformator {
 
     private List<IngredientDto> convertIngredients(List<Ingredient> ingredients, String measurement) {
         return ingredients.stream().filter(Objects::nonNull).map(ingredient -> {
-            /* TODO UnitOf investigation */
             IngredientDto dto = new IngredientDto();
             dto.setName(ingredient.getName());
-            dto.setAmount(ingredient.getAmount());
-            dto.setUnit(ingredient.getUnit());
+            UnitTransformator transformator = transformatorCommandProvider.getTransformator(ingredient.getUnit());
+            if (measurement.equals(IMPERIAL)) {
+                dto.setAmount(transformator.convert(ingredient.getAmount()));
+                dto.setUnit(transformator.convertUnit(ingredient.getUnit()));
+            } else {
+                dto.setAmount(BigDecimal.valueOf(ingredient.getAmount()).setScale(2, RoundingMode.HALF_UP));
+                dto.setUnit(ingredient.getUnit());
+            }
+
             dto.setIsReplaceable(ingredient.getReplaceable());
             return dto;
         }).collect(Collectors.toList());
