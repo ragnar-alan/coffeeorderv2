@@ -52,7 +52,7 @@ public class CoffeeService {
 
     public Coffee updateCoffee(CoffeeRequestWithId request, String coffeeId) {
         Coffee coffeeExists = isCoffeeExistsById(coffeeId);
-        Coffee convertedUpdateRequest = coffeeTransformator.convertRequestToEntity(request, coffeeExists);
+        Coffee convertedUpdateRequest = coffeeTransformator.convertUpdateRequestToEntity(request, coffeeExists);
         if (coffeeExists != null) {
             return coffeeRepository.save(convertedUpdateRequest);
         } else {

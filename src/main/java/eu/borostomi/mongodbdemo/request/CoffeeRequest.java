@@ -1,6 +1,7 @@
-package eu.borostomi.mongodbdemo.dto;
+package eu.borostomi.mongodbdemo.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import eu.borostomi.mongodbdemo.dto.RecipesDto;
+import eu.borostomi.mongodbdemo.model.ShortRecipe;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -8,20 +9,16 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 @Data
 @NoArgsConstructor
 @ToString
-@JsonInclude(Include.NON_NULL)
-public class CoffeeDto {
-    private String id;
+public class CoffeeRequest {
     private String name;
     private String aromaProfile;
     private String aromaNotes;
     private List<String> cupSize;
     private Integer tasteIntensity;
-    private RecipesDto recipe;
+    private List<ShortRecipe> recipes;
     private Boolean isCollection;
     private BigDecimal price;
     private Boolean isOrderable;

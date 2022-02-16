@@ -1,6 +1,5 @@
 package eu.borostomi.mongodbdemo.transformator;
 
-import com.digidemic.unitof.UnitOf;
 import eu.borostomi.mongodbdemo.documents.Coffee;
 import eu.borostomi.mongodbdemo.documents.Ingredient;
 import eu.borostomi.mongodbdemo.documents.Recipe;
@@ -15,14 +14,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Component
 public class CoffeeTransformator {
 
     public static final String IMPERIAL = "imperial";
-    private TransformatorCommandProvider transformatorCommandProvider;
+    private final TransformatorCommandProvider transformatorCommandProvider;
 
     public CoffeeTransformator(TransformatorCommandProvider transformatorCommandProvider) {
         this.transformatorCommandProvider = transformatorCommandProvider;
@@ -91,7 +89,7 @@ public class CoffeeTransformator {
         return coffee;
     }
 
-    public Coffee convertRequestToEntity(CoffeeRequestWithId request, Coffee coffee) {
+    public Coffee convertUpdateRequestToEntity(CoffeeRequestWithId request, Coffee coffee) {
         coffee.setId(request.getId());
         coffee.setName(request.getName());
         coffee.setAromaProfile(request.getAromaProfile());
