@@ -5,13 +5,15 @@ import eu.borostomi.mongodbdemo.documents.Recipe;
 import eu.borostomi.mongodbdemo.model.ShortRecipe;
 import eu.borostomi.mongodbdemo.repository.CoffeeRepository;
 import eu.borostomi.mongodbdemo.repository.RecipeRepository;
-import eu.borostomi.mongodbdemo.request.CoffeeRequest;
+import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
+import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import eu.borostomi.mongodbdemo.transformator.CoffeeTransformator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class CoffeeService {
@@ -38,9 +40,9 @@ public class CoffeeService {
         return coffeeTransformator.convertCoffeeToDto(coffee, recipe, measurement).toString();
     }
 
-    public Coffee createCoffee(CoffeeRequest request, String measurement) {
-        Coffee convertedRequest = coffeeTransformator.convertRequestToEntity(request, measurement);
-        Boolean coffeeExists = isCoffeeExists(request, convertedRequest);
+    public Coffee createCoffee(BaseCoffeeRequest request) {
+        Coffee convertedRequest = coffeeTransformator.convertRequestToEntity(request, new Coffee());
+        Boolean coffeeExists = isCoffeeExistsByName(request, convertedRequest);
         if (!coffeeExists) {
             return coffeeRepository.insert(convertedRequest);
         } else {
@@ -48,11 +50,26 @@ public class CoffeeService {
         }
     }
 
-    private Boolean isCoffeeExists(CoffeeRequest request, Coffee convertedRequest) {
+    public Coffee updateCoffee(CoffeeRequestWithId request, String coffeeId) {
+        Coffee coffeeExists = isCoffeeExistsById(coffeeId);
+        Coffee convertedUpdateRequest = coffeeTransformator.convertUpdateRequestToEntity(request, coffeeExists);
+        if (coffeeExists != null) {
+            return coffeeRepository.save(convertedUpdateRequest);
+        } else {
+            throw new RuntimeException("Coffee not exists");
+        }
+    }
+
+    private Boolean isCoffeeExistsByName(BaseCoffeeRequest request, Coffee convertedRequest) {
         Coffee coffee = coffeeRepository.findByName(request.getName());
         if (coffee == null) {
             return false;
         }
         return coffee.equals(convertedRequest);
+    }
+
+    private Coffee isCoffeeExistsById(String coffeeId) {
+        Optional<Coffee> coffee = coffeeRepository.findById(coffeeId);
+        return coffee.orElse(null);
     }
 }
