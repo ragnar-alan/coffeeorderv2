@@ -7,6 +7,8 @@ import eu.borostomi.mongodbdemo.documents.Recipe;
 import eu.borostomi.mongodbdemo.dto.CoffeeDto;
 import eu.borostomi.mongodbdemo.dto.IngredientDto;
 import eu.borostomi.mongodbdemo.dto.RecipesDto;
+import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
+import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -73,5 +75,34 @@ public class CoffeeTransformator {
             dto.setIsReplaceable(ingredient.getReplaceable());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    public Coffee convertRequestToEntity(BaseCoffeeRequest request, Coffee coffee) {
+        coffee.setName(request.getName());
+        coffee.setAromaProfile(request.getAromaProfile());
+        coffee.setAromaNotes(request.getAromaNotes());
+        coffee.setCupSize(request.getCupSize());
+        coffee.setTasteIntensity(request.getTasteIntensity());
+        coffee.setRecipes(request.getRecipes());
+        coffee.setCollection(request.getIsCollection());
+        coffee.setPrice(request.getPrice());
+        coffee.setOrderable(request.getOrderable());
+        coffee.setIsDecaff(request.getIsDecaff());
+        return coffee;
+    }
+
+    public Coffee convertRequestToEntity(CoffeeRequestWithId request, Coffee coffee) {
+        coffee.setId(request.getId());
+        coffee.setName(request.getName());
+        coffee.setAromaProfile(request.getAromaProfile());
+        coffee.setAromaNotes(request.getAromaNotes());
+        coffee.setCupSize(request.getCupSize());
+        coffee.setTasteIntensity(request.getTasteIntensity());
+        coffee.setRecipes(request.getRecipes());
+        coffee.setCollection(request.getIsCollection());
+        coffee.setPrice(request.getPrice());
+        coffee.setOrderable(request.getOrderable());
+        coffee.setIsDecaff(request.getIsDecaff());
+        return coffee;
     }
 }

@@ -1,27 +1,25 @@
-package eu.borostomi.mongodbdemo.documents;
+package eu.borostomi.mongodbdemo.request;
 
+import eu.borostomi.mongodbdemo.dto.RecipesDto;
 import eu.borostomi.mongodbdemo.model.ShortRecipe;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Document("coffees")
 @Data
 @NoArgsConstructor
-public class Coffee {
-    @Id
-    private String id;
+@ToString
+public class BaseCoffeeRequest {
     private String name;
     private String aromaProfile;
     private String aromaNotes;
     private List<String> cupSize;
     private Integer tasteIntensity;
     private List<ShortRecipe> recipes;
-    private Boolean collection;
+    private Boolean isCollection;
     private BigDecimal price;
     private Boolean orderable;
     private Boolean isDecaff;
