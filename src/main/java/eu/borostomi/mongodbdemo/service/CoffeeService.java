@@ -1,16 +1,22 @@
 package eu.borostomi.mongodbdemo.service;
 
 import eu.borostomi.mongodbdemo.documents.Coffee;
+import eu.borostomi.mongodbdemo.documents.DeletedCoffee;
+import eu.borostomi.mongodbdemo.documents.DeletedCoffeeBuilder;
 import eu.borostomi.mongodbdemo.documents.Recipe;
 import eu.borostomi.mongodbdemo.model.ShortRecipe;
 import eu.borostomi.mongodbdemo.repository.CoffeeRepository;
+import eu.borostomi.mongodbdemo.repository.DeletedCoffeeRepository;
 import eu.borostomi.mongodbdemo.repository.RecipeRepository;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import eu.borostomi.mongodbdemo.transformator.CoffeeTransformator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -22,11 +28,13 @@ public class CoffeeService {
     private final CoffeeRepository coffeeRepository;
     private final RecipeRepository recipeRepository;
     private final CoffeeTransformator coffeeTransformator;
+    private final DeletedCoffeeRepository deletedCoffeeRepository;
 
-    public CoffeeService(CoffeeRepository coffeeRepository, CoffeeTransformator coffeeTransformator, RecipeRepository recipeRepository) {
+    public CoffeeService(CoffeeRepository coffeeRepository, CoffeeTransformator coffeeTransformator, RecipeRepository recipeRepository, DeletedCoffeeRepository deletedCoffeeRepository) {
         this.coffeeRepository = coffeeRepository;
         this.recipeRepository = recipeRepository;
         this.coffeeTransformator = coffeeTransformator;
+        this.deletedCoffeeRepository = deletedCoffeeRepository;
     }
 
     public String getCoffeeByName(String name, String measurement) {
@@ -38,6 +46,11 @@ public class CoffeeService {
             recipe = null;
         }
         return coffeeTransformator.convertCoffeeToDto(coffee, recipe, measurement).toString();
+    }
+
+    public Coffee getCoffeeById(String id) {
+        Optional<Coffee> coffee = coffeeRepository.findById(id);
+        return coffee.orElse(null);
     }
 
     public Coffee createCoffee(BaseCoffeeRequest request) {
@@ -58,6 +71,37 @@ public class CoffeeService {
         } else {
             throw new RuntimeException("Coffee not exists");
         }
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteCoffee(String coffeeId) {
+        Coffee coffee = getCoffeeById(coffeeId);
+        if (coffee == null) {
+            return new ResponseEntity<>("The coffee you want to delete is not exist. Coffee id: " + coffeeId, HttpStatus.NOT_FOUND);
+        }
+        DeletedCoffee deletedCoffee = new DeletedCoffeeBuilder()
+                .setId(coffee.getId())
+                .setName(coffee.getName())
+                .setAromaProfile(coffee.getAromaProfile())
+                .setAromaNotes(coffee.getAromaNotes())
+                .setCupSize(coffee.getCupSize())
+                .setTasteIntensity(coffee.getTasteIntensity())
+                .setRecipes(coffee.getRecipes())
+                .setCollection(coffee.getCollection())
+                .setPrice(coffee.getPrice())
+                .setOrderable(coffee.getOrderable())
+                .setIsDecaff(coffee.getIsDecaff())
+                .build();
+        coffee.setOrderable(false);
+        ResponseEntity<String> result;
+        try {
+            deletedCoffeeRepository.save(deletedCoffee);
+            coffeeRepository.deleteById(coffeeId);
+            result = new ResponseEntity<>("Coffee deleted", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            result = new ResponseEntity<>("Cannot delete coffee:" + coffee.getName() + " " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return result;
     }
 
     private Boolean isCoffeeExistsByName(BaseCoffeeRequest request, Coffee convertedRequest) {

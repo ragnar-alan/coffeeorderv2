@@ -4,9 +4,11 @@ import eu.borostomi.mongodbdemo.dto.CoffeeDto;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import eu.borostomi.mongodbdemo.service.CoffeeService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,5 +40,10 @@ public class CoffeeController {
     public ResponseEntity<CoffeeDto> updateCoffee(@PathVariable String coffeeId, @RequestBody CoffeeRequestWithId request) {
         coffeeService.updateCoffee(request, coffeeId);
         return null;
+    }
+
+    @DeleteMapping(path = "/coffee-details/{coffeeId}")
+    public ResponseEntity<String> deleteCoffee(@PathVariable String coffeeId) {
+        return coffeeService.deleteCoffee(coffeeId);
     }
 }
