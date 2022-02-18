@@ -27,6 +27,9 @@ public class CoffeeTransformator {
     }
 
     public CoffeeDto convertCoffeeToDto(Coffee coffee, Recipe recipe, String measurement) {
+        if (coffee == null) {
+            return null;
+        }
         CoffeeDto dto = new CoffeeDto();
         dto.setId(coffee.getId());
         dto.setName(coffee.getName());
@@ -34,7 +37,11 @@ public class CoffeeTransformator {
         dto.setAromaNotes(coffee.getAromaNotes());
         dto.setCupSize(coffee.getCupSize());
         dto.setTasteIntensity(coffee.getTasteIntensity());
-        dto.setRecipe(convertRecipes(recipe, measurement));
+        if (measurement == null) {
+            dto.setRecipe(convertRecipes(recipe, "metric"));
+        } else {
+            dto.setRecipe(convertRecipes(recipe, measurement));
+        }
         dto.setIsCollection(coffee.getCollection());
         dto.setPrice(coffee.getPrice());
         dto.setIsOrderable(coffee.getOrderable());

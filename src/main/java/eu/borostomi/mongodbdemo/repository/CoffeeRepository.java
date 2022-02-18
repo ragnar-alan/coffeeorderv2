@@ -11,6 +11,5 @@ import java.util.List;
 public interface CoffeeRepository extends MongoRepository<Coffee, String> {
 
     Coffee findByName(String name);
-    Coffee findByAromaProfile(String aromaProfile);
     List<Coffee> findAll();
 }
