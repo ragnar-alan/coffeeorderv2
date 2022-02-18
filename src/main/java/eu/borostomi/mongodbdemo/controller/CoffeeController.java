@@ -1,5 +1,6 @@
 package eu.borostomi.mongodbdemo.controller;
 
+import eu.borostomi.mongodbdemo.documents.Coffee;
 import eu.borostomi.mongodbdemo.dto.CoffeeDto;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
@@ -26,14 +27,13 @@ public class CoffeeController {
     }
 
     @GetMapping(path = "/coffee-details/{coffeeName}")
-    public String home(@PathVariable String coffeeName, @CookieValue(name = "measurement", required = false) String measurement) {
+    public ResponseEntity<CoffeeDto> home(@PathVariable String coffeeName, @CookieValue(name = "measurement", required = false) String measurement) {
         return coffeeService.getCoffeeByName(coffeeName, measurement);
     }
 
     @PostMapping(path = "/coffee-details/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CoffeeDto> createCoffee(@RequestBody BaseCoffeeRequest request) {
-        coffeeService.createCoffee(request);
-        return null;
+        return coffeeService.createCoffee(request);
     }
 
     @PutMapping(path = "/coffee-details/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)

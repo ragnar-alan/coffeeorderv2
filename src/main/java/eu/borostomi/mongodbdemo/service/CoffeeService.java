@@ -4,6 +4,7 @@ import eu.borostomi.mongodbdemo.documents.Coffee;
 import eu.borostomi.mongodbdemo.documents.DeletedCoffee;
 import eu.borostomi.mongodbdemo.documents.DeletedCoffeeBuilder;
 import eu.borostomi.mongodbdemo.documents.Recipe;
+import eu.borostomi.mongodbdemo.dto.CoffeeDto;
 import eu.borostomi.mongodbdemo.model.ShortRecipe;
 import eu.borostomi.mongodbdemo.repository.CoffeeRepository;
 import eu.borostomi.mongodbdemo.repository.DeletedCoffeeRepository;
@@ -37,15 +38,15 @@ public class CoffeeService {
         this.deletedCoffeeRepository = deletedCoffeeRepository;
     }
 
-    public String getCoffeeByName(String name, String measurement) {
+    public ResponseEntity<CoffeeDto> getCoffeeByName(String name, String measurement) {
         Coffee coffee = coffeeRepository.findByName(name);
-        Recipe recipe;
-        if (!coffee.getRecipes().isEmpty()) {
-            recipe = recipeRepository.findRecipeByName(coffee.getRecipes().stream().filter(Objects::nonNull).map(ShortRecipe::getName).findFirst().get());
+        Recipe recipe = getRecipe(coffee);
+        CoffeeDto result = coffeeTransformator.convertCoffeeToDto(coffee, recipe, measurement);
+        if (result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            recipe = null;
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return coffeeTransformator.convertCoffeeToDto(coffee, recipe, measurement).toString();
     }
 
     public Coffee getCoffeeById(String id) {
@@ -53,23 +54,30 @@ public class CoffeeService {
         return coffee.orElse(null);
     }
 
-    public Coffee createCoffee(BaseCoffeeRequest request) {
+    public ResponseEntity<CoffeeDto> createCoffee(BaseCoffeeRequest request) {
         Coffee convertedRequest = coffeeTransformator.convertRequestToEntity(request, new Coffee());
         Boolean coffeeExists = isCoffeeExistsByName(request, convertedRequest);
         if (!coffeeExists) {
-            return coffeeRepository.insert(convertedRequest);
+            CoffeeDto result = coffeeTransformator.convertCoffeeToDto(coffeeRepository.insert(convertedRequest), null, null);
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
         } else {
-            throw new RuntimeException("Coffee already exists");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    public Coffee updateCoffee(CoffeeRequestWithId request, String coffeeId) {
+    public ResponseEntity<CoffeeDto> updateCoffee(CoffeeRequestWithId request, String coffeeId) {
         Coffee coffeeExists = isCoffeeExistsById(coffeeId);
-        Coffee convertedUpdateRequest = coffeeTransformator.convertUpdateRequestToEntity(request, coffeeExists);
         if (coffeeExists != null) {
-            return coffeeRepository.save(convertedUpdateRequest);
+            try {
+                Coffee convertedUpdateRequest = coffeeTransformator.convertUpdateRequestToEntity(request, coffeeExists);
+                Recipe recipe = getRecipe(convertedUpdateRequest);
+                CoffeeDto result = coffeeTransformator.convertCoffeeToDto(coffeeRepository.save(convertedUpdateRequest), recipe, null);
+                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         } else {
-            throw new RuntimeException("Coffee not exists");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -115,5 +123,15 @@ public class CoffeeService {
     private Coffee isCoffeeExistsById(String coffeeId) {
         Optional<Coffee> coffee = coffeeRepository.findById(coffeeId);
         return coffee.orElse(null);
+    }
+
+    private Recipe getRecipe(Coffee coffee) {
+        Recipe recipe;
+        if (!coffee.getRecipes().isEmpty()) {
+            recipe = recipeRepository.findRecipeByName(coffee.getRecipes().stream().filter(Objects::nonNull).map(ShortRecipe::getName).findFirst().get());
+        } else {
+            recipe = null;
+        }
+        return recipe;
     }
 }
