@@ -19,7 +19,7 @@ public class Recipe {
     private Integer prepTime;
     private String prepUnit;
     private String difficulty;
-    private List<String> materials;
+    private List<Step> steps;
     private List<Ingredient> ingredients;
-    private List<String> steps;
+    private List<String> materials;
 }

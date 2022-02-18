@@ -87,6 +87,7 @@ public class CoffeeService {
         if (coffee == null) {
             return new ResponseEntity<>("The coffee you want to delete is not exist. Coffee id: " + coffeeId, HttpStatus.NOT_FOUND);
         }
+        coffee.setOrderable(false);
         DeletedCoffee deletedCoffee = new DeletedCoffeeBuilder()
                 .setId(coffee.getId())
                 .setName(coffee.getName())
@@ -100,7 +101,6 @@ public class CoffeeService {
                 .setOrderable(coffee.getOrderable())
                 .setIsDecaff(coffee.getIsDecaff())
                 .build();
-        coffee.setOrderable(false);
         ResponseEntity<String> result;
         try {
             deletedCoffeeRepository.save(deletedCoffee);
@@ -128,7 +128,7 @@ public class CoffeeService {
     private Recipe getRecipe(Coffee coffee) {
         Recipe recipe;
         if (!coffee.getRecipes().isEmpty()) {
-            recipe = recipeRepository.findRecipeByName(coffee.getRecipes().stream().filter(Objects::nonNull).map(ShortRecipe::getName).findFirst().get());
+            recipe = recipeRepository.findByName(coffee.getRecipes().stream().filter(Objects::nonNull).map(ShortRecipe::getName).findFirst().get());
         } else {
             recipe = null;
         }

@@ -27,7 +27,7 @@ public class CoffeeController {
     }
 
     @GetMapping(path = "/coffee-details/{coffeeName}")
-    public ResponseEntity<CoffeeDto> home(@PathVariable String coffeeName, @CookieValue(name = "measurement", required = false) String measurement) {
+    public ResponseEntity<CoffeeDto> getCoffeeDetails(@PathVariable String coffeeName, @CookieValue(name = "measurement", required = false) String measurement) {
         return coffeeService.getCoffeeByName(coffeeName, measurement);
     }
 
