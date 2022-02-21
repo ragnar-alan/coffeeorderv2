@@ -20,28 +20,32 @@ public class CoffeeController {
 
     private final CoffeeService coffeeService;
 
-    public CoffeeController(CoffeeService coffeeService) {
+    public CoffeeController(final CoffeeService coffeeService) {
         this.coffeeService = coffeeService;
     }
 
     @GetMapping(path = "/coffee-details/{coffeeName}")
-    public ResponseEntity<CoffeeDto> home(@PathVariable String coffeeName, @CookieValue(name = "measurement", required = false) String measurement) {
+    public ResponseEntity<CoffeeDto> getCoffee(
+            @PathVariable final String coffeeName,
+            @CookieValue(name = "measurement", required = false) final String measurement) {
         return coffeeService.getCoffeeByName(coffeeName, measurement);
     }
 
     @PostMapping(path = "/coffee-details/create", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CoffeeDto> createCoffee(@RequestBody BaseCoffeeRequest request) {
+    public ResponseEntity<CoffeeDto> createCoffee(@RequestBody final BaseCoffeeRequest request) {
         return coffeeService.createCoffee(request);
     }
 
     @PutMapping(path = "/coffee-details/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CoffeeDto> updateCoffee(@PathVariable String coffeeId, @RequestBody CoffeeRequestWithId request) {
+    public ResponseEntity<CoffeeDto> updateCoffee(
+            @PathVariable final String coffeeId,
+            @RequestBody final CoffeeRequestWithId request) {
         coffeeService.updateCoffee(request, coffeeId);
         return null;
     }
 
     @DeleteMapping(path = "/coffee-details/{coffeeId}")
-    public ResponseEntity<String> deleteCoffee(@PathVariable String coffeeId) {
+    public ResponseEntity<String> deleteCoffee(@PathVariable final String coffeeId) {
         return coffeeService.deleteCoffee(coffeeId);
     }
 }

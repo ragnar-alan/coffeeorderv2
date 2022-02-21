@@ -21,25 +21,28 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@SuppressWarnings("HiddenFieldCheck")
 public class CoffeeService {
 
-    public static final String COFFEE_NOT_EXIST_DELETE = "The coffee you want to delete is not exist. Coffee id: ";
-    public static final String CANNOT_DELETE_COFFEE = "Cannot delete coffee:";
-    public static final String COFFEE_DELETED = "Coffee deleted";
+    private static final String COFFEE_NOT_EXIST_DELETE = "The coffee you want to delete is not exist. Coffee id: ";
+    private static final String CANNOT_DELETE_COFFEE = "Cannot delete coffee:";
+    private static final String COFFEE_DELETED = "Coffee deleted";
     private final CoffeeRepository coffeeRepository;
     private final RecipeRepository recipeRepository;
     private final CoffeeTransformator coffeeTransformator;
     private final DeletedCoffeeRepository deletedCoffeeRepository;
 
-    public CoffeeService(CoffeeRepository coffeeRepository, CoffeeTransformator coffeeTransformator,
-                         RecipeRepository recipeRepository, DeletedCoffeeRepository deletedCoffeeRepository) {
+    public CoffeeService(final CoffeeRepository coffeeRepository,
+                         final CoffeeTransformator coffeeTransformator,
+                         final RecipeRepository recipeRepository,
+                         final DeletedCoffeeRepository deletedCoffeeRepository) {
         this.coffeeRepository = coffeeRepository;
         this.recipeRepository = recipeRepository;
         this.coffeeTransformator = coffeeTransformator;
         this.deletedCoffeeRepository = deletedCoffeeRepository;
     }
 
-    public ResponseEntity<CoffeeDto> getCoffeeByName(String name, String measurement) {
+    public ResponseEntity<CoffeeDto> getCoffeeByName(final String name, final String measurement) {
         Coffee coffee = coffeeRepository.findByName(name);
         Recipe recipe = getRecipe(coffee);
         CoffeeDto result = coffeeTransformator.convertCoffeeToDto(coffee, recipe, measurement);
@@ -50,12 +53,12 @@ public class CoffeeService {
         }
     }
 
-    public Coffee getCoffeeById(String id) {
+    public Coffee getCoffeeById(final String id) {
         Optional<Coffee> coffee = coffeeRepository.findById(id);
         return coffee.orElse(null);
     }
 
-    public ResponseEntity<CoffeeDto> createCoffee(BaseCoffeeRequest request) {
+    public ResponseEntity<CoffeeDto> createCoffee(final BaseCoffeeRequest request) {
         Coffee convertedRequest = coffeeTransformator.convertRequestToEntity(request, new Coffee());
         Boolean coffeeExists = isCoffeeExistsByName(request, convertedRequest);
         if (!coffeeExists) {
@@ -67,7 +70,7 @@ public class CoffeeService {
         }
     }
 
-    public ResponseEntity<CoffeeDto> updateCoffee(CoffeeRequestWithId request, String coffeeId) {
+    public ResponseEntity<CoffeeDto> updateCoffee(final CoffeeRequestWithId request, final String coffeeId) {
         Coffee coffeeExists = isCoffeeExistsById(coffeeId);
         if (coffeeExists != null) {
             try {
@@ -85,7 +88,7 @@ public class CoffeeService {
     }
 
     @Transactional
-    public ResponseEntity<String> deleteCoffee(String coffeeId) {
+    public ResponseEntity<String> deleteCoffee(final String coffeeId) {
         Coffee coffee = getCoffeeById(coffeeId);
         if (coffee == null) {
             return new ResponseEntity<>(COFFEE_NOT_EXIST_DELETE + coffeeId, HttpStatus.NOT_FOUND);
@@ -110,14 +113,14 @@ public class CoffeeService {
             coffeeRepository.deleteById(coffeeId);
             result = new ResponseEntity<>(COFFEE_DELETED, HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            result = new ResponseEntity<>(CANNOT_DELETE_COFFEE +
-                    coffee.getName() +
-                    " " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            result = new ResponseEntity<>(CANNOT_DELETE_COFFEE
+                    + coffee.getName()
+                    + " " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return result;
     }
 
-    private Boolean isCoffeeExistsByName(BaseCoffeeRequest request, Coffee convertedRequest) {
+    private Boolean isCoffeeExistsByName(final BaseCoffeeRequest request, final Coffee convertedRequest) {
         Coffee coffee = coffeeRepository.findByName(request.getName());
         if (coffee == null) {
             return false;
@@ -125,12 +128,12 @@ public class CoffeeService {
         return coffee.equals(convertedRequest);
     }
 
-    private Coffee isCoffeeExistsById(String coffeeId) {
+    private Coffee isCoffeeExistsById(final String coffeeId) {
         Optional<Coffee> coffee = coffeeRepository.findById(coffeeId);
         return coffee.orElse(null);
     }
 
-    private Recipe getRecipe(Coffee coffee) {
+    private Recipe getRecipe(final Coffee coffee) {
         Recipe recipe;
         if (!coffee.getRecipes().isEmpty()) {
             recipe = recipeRepository.findRecipeByName(
