@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <suppress checks="." files="MongodbdemoApplication.java"/>
+
+    <suppress checks="." files="[\\/]dto[\\/].*\.java$"/>
+    <suppress checks="." files="[\\/]documents[\\/].*\.java$"/>
+    <suppress checks="MagicNumberCheck"
+              files="JavadocStyleCheck.java"
+              lines="221"/>
+    <suppress checks="FinalClass"/>
+    <suppress checks="DesignForExtensionCheck"/>
+    <suppress checks="HiddenFieldCheck" files="[\\/]controller[\\/].*Controller\.java$"/>
+    <suppress checks="HiddenFieldCheck" files="[\\/]service[\\/].*Service\.java$"/>
+    <suppress checks="HiddenFieldCheck" files="[\\/]transformator[\\/].*\.java$"/>
+</suppressions>

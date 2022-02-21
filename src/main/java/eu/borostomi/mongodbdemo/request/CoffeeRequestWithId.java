@@ -7,6 +7,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @ToString
-public class CoffeeRequestWithId extends BaseCoffeeRequest{
+public class CoffeeRequestWithId extends BaseCoffeeRequest {
     private String id;
 }

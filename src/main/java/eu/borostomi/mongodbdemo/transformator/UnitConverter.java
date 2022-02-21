@@ -1,12 +1,11 @@
 package eu.borostomi.mongodbdemo.transformator;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class UnitTransformator {
+public abstract class UnitConverter {
     private static final Map<String, String> UNITS;
 
     static {
@@ -19,7 +18,7 @@ public abstract class UnitTransformator {
 
     abstract BigDecimal convert(double from);
 
-    String convertUnit(String from) {
+    String convertUnit(final String from) {
         String result = UNITS.get(from);
         if (result == null) {
             throw new RuntimeException("Invalid unit: " + from);
