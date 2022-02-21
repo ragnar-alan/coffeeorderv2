@@ -83,21 +83,17 @@ public class CoffeeTransformator {
     }
 
     public Coffee convertRequestToEntity(BaseCoffeeRequest request, Coffee coffee) {
-        coffee.setName(request.getName());
-        coffee.setAromaProfile(request.getAromaProfile());
-        coffee.setAromaNotes(request.getAromaNotes());
-        coffee.setCupSize(request.getCupSize());
-        coffee.setTasteIntensity(request.getTasteIntensity());
-        coffee.setRecipes(request.getRecipes());
-        coffee.setCollection(request.getIsCollection());
-        coffee.setPrice(request.getPrice());
-        coffee.setOrderable(request.getOrderable());
-        coffee.setIsDecaff(request.getIsDecaff());
+        setCoffeeFields(request, coffee);
         return coffee;
     }
 
     public Coffee convertUpdateRequestToEntity(CoffeeRequestWithId request, Coffee coffee) {
         coffee.setId(request.getId());
+        setCoffeeFields(request, coffee);
+        return coffee;
+    }
+
+    private void setCoffeeFields(BaseCoffeeRequest request, Coffee coffee) {
         coffee.setName(request.getName());
         coffee.setAromaProfile(request.getAromaProfile());
         coffee.setAromaNotes(request.getAromaNotes());
@@ -108,6 +104,5 @@ public class CoffeeTransformator {
         coffee.setPrice(request.getPrice());
         coffee.setOrderable(request.getOrderable());
         coffee.setIsDecaff(request.getIsDecaff());
-        return coffee;
     }
 }
