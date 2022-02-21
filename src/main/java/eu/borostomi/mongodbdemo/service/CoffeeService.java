@@ -23,12 +23,16 @@ import java.util.Optional;
 @Service
 public class CoffeeService {
 
+    public static final String COFFEE_NOT_EXIST_DELETE = "The coffee you want to delete is not exist. Coffee id: ";
+    public static final String CANNOT_DELETE_COFFEE = "Cannot delete coffee:";
+    public static final String COFFEE_DELETED = "Coffee deleted";
     private final CoffeeRepository coffeeRepository;
     private final RecipeRepository recipeRepository;
     private final CoffeeTransformator coffeeTransformator;
     private final DeletedCoffeeRepository deletedCoffeeRepository;
 
-    public CoffeeService(CoffeeRepository coffeeRepository, CoffeeTransformator coffeeTransformator, RecipeRepository recipeRepository, DeletedCoffeeRepository deletedCoffeeRepository) {
+    public CoffeeService(CoffeeRepository coffeeRepository, CoffeeTransformator coffeeTransformator,
+                         RecipeRepository recipeRepository, DeletedCoffeeRepository deletedCoffeeRepository) {
         this.coffeeRepository = coffeeRepository;
         this.recipeRepository = recipeRepository;
         this.coffeeTransformator = coffeeTransformator;
@@ -55,7 +59,8 @@ public class CoffeeService {
         Coffee convertedRequest = coffeeTransformator.convertRequestToEntity(request, new Coffee());
         Boolean coffeeExists = isCoffeeExistsByName(request, convertedRequest);
         if (!coffeeExists) {
-            CoffeeDto result = coffeeTransformator.convertCoffeeToDto(coffeeRepository.insert(convertedRequest), null, null);
+            CoffeeDto result = coffeeTransformator.convertCoffeeToDto(
+                    coffeeRepository.insert(convertedRequest), null, null);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -68,7 +73,8 @@ public class CoffeeService {
             try {
                 Coffee convertedUpdateRequest = coffeeTransformator.convertUpdateRequestToEntity(request, coffeeExists);
                 Recipe recipe = getRecipe(convertedUpdateRequest);
-                CoffeeDto result = coffeeTransformator.convertCoffeeToDto(coffeeRepository.save(convertedUpdateRequest), recipe, null);
+                CoffeeDto result = coffeeTransformator.convertCoffeeToDto(
+                        coffeeRepository.save(convertedUpdateRequest), recipe, null);
                 return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -82,7 +88,7 @@ public class CoffeeService {
     public ResponseEntity<String> deleteCoffee(String coffeeId) {
         Coffee coffee = getCoffeeById(coffeeId);
         if (coffee == null) {
-            return new ResponseEntity<>("The coffee you want to delete is not exist. Coffee id: " + coffeeId, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(COFFEE_NOT_EXIST_DELETE + coffeeId, HttpStatus.NOT_FOUND);
         }
         DeletedCoffee deletedCoffee = new DeletedCoffeeBuilder()
                 .setId(coffee.getId())
@@ -102,9 +108,11 @@ public class CoffeeService {
         try {
             deletedCoffeeRepository.save(deletedCoffee);
             coffeeRepository.deleteById(coffeeId);
-            result = new ResponseEntity<>("Coffee deleted", HttpStatus.NO_CONTENT);
+            result = new ResponseEntity<>(COFFEE_DELETED, HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            result = new ResponseEntity<>("Cannot delete coffee:" + coffee.getName() + " " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            result = new ResponseEntity<>(CANNOT_DELETE_COFFEE +
+                    coffee.getName() +
+                    " " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         return result;
     }
@@ -125,7 +133,12 @@ public class CoffeeService {
     private Recipe getRecipe(Coffee coffee) {
         Recipe recipe;
         if (!coffee.getRecipes().isEmpty()) {
-            recipe = recipeRepository.findRecipeByName(coffee.getRecipes().stream().filter(Objects::nonNull).map(ShortRecipe::getName).findFirst().get());
+            recipe = recipeRepository.findRecipeByName(
+                    coffee.getRecipes().stream()
+                            .filter(Objects::nonNull)
+                            .map(ShortRecipe::getName)
+                            .findFirst()
+                            .get());
         } else {
             recipe = null;
         }
