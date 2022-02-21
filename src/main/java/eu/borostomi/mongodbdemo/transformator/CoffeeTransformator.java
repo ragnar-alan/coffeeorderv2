@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 public class CoffeeTransformator {
 
     public static final String IMPERIAL = "imperial";
-    private final TransformatorCommandProvider transformatorCommandProvider;
+    private final ConverterProvider converterProvider;
 
-    public CoffeeTransformator(TransformatorCommandProvider transformatorCommandProvider) {
-        this.transformatorCommandProvider = transformatorCommandProvider;
+    public CoffeeTransformator(final ConverterProvider converterProvider) {
+        this.converterProvider = converterProvider;
     }
 
-    public CoffeeDto convertCoffeeToDto(Coffee coffee, Recipe recipe, String measurement) {
+    public CoffeeDto convertCoffeeToDto(final Coffee coffee, final Recipe recipe, final String measurement) {
         if (coffee == null) {
             return null;
         }
@@ -37,11 +37,7 @@ public class CoffeeTransformator {
         dto.setAromaNotes(coffee.getAromaNotes());
         dto.setCupSize(coffee.getCupSize());
         dto.setTasteIntensity(coffee.getTasteIntensity());
-        if (measurement == null) {
-            dto.setRecipe(convertRecipes(recipe, "metric"));
-        } else {
-            dto.setRecipe(convertRecipes(recipe, measurement));
-        }
+        dto.setRecipe(convertRecipes(recipe, Objects.requireNonNullElse(measurement, "metric")));
         dto.setIsCollection(coffee.getCollection());
         dto.setPrice(coffee.getPrice());
         dto.setIsOrderable(coffee.getOrderable());
@@ -49,7 +45,7 @@ public class CoffeeTransformator {
         return dto;
     }
 
-    private RecipesDto convertRecipes(Recipe recipe, String measurement) {
+    private RecipesDto convertRecipes(final Recipe recipe, final String measurement) {
         if (recipe == null) {
             return null;
         }
@@ -64,11 +60,11 @@ public class CoffeeTransformator {
         return dto;
     }
 
-    private List<IngredientDto> convertIngredients(List<Ingredient> ingredients, String measurement) {
+    private List<IngredientDto> convertIngredients(final List<Ingredient> ingredients, final String measurement) {
         return ingredients.stream().filter(Objects::nonNull).map(ingredient -> {
             IngredientDto dto = new IngredientDto();
             dto.setName(ingredient.getName());
-            UnitTransformator transformator = transformatorCommandProvider.getTransformator(ingredient.getUnit());
+            UnitConverter transformator = converterProvider.getTransformator(ingredient.getUnit());
             if (measurement.equals(IMPERIAL)) {
                 dto.setAmount(transformator.convert(ingredient.getAmount()));
                 dto.setUnit(transformator.convertUnit(ingredient.getUnit()));
@@ -82,22 +78,18 @@ public class CoffeeTransformator {
         }).collect(Collectors.toList());
     }
 
-    public Coffee convertRequestToEntity(BaseCoffeeRequest request, Coffee coffee) {
-        coffee.setName(request.getName());
-        coffee.setAromaProfile(request.getAromaProfile());
-        coffee.setAromaNotes(request.getAromaNotes());
-        coffee.setCupSize(request.getCupSize());
-        coffee.setTasteIntensity(request.getTasteIntensity());
-        coffee.setRecipes(request.getRecipes());
-        coffee.setCollection(request.getIsCollection());
-        coffee.setPrice(request.getPrice());
-        coffee.setOrderable(request.getOrderable());
-        coffee.setIsDecaff(request.getIsDecaff());
+    public Coffee convertRequestToEntity(final BaseCoffeeRequest request, final Coffee coffee) {
+        setCoffeeFields(request, coffee);
         return coffee;
     }
 
-    public Coffee convertUpdateRequestToEntity(CoffeeRequestWithId request, Coffee coffee) {
+    public Coffee convertUpdateRequestToEntity(final CoffeeRequestWithId request, final Coffee coffee) {
         coffee.setId(request.getId());
+        setCoffeeFields(request, coffee);
+        return coffee;
+    }
+
+    private void setCoffeeFields(final BaseCoffeeRequest request, final Coffee coffee) {
         coffee.setName(request.getName());
         coffee.setAromaProfile(request.getAromaProfile());
         coffee.setAromaNotes(request.getAromaNotes());
@@ -108,6 +100,5 @@ public class CoffeeTransformator {
         coffee.setPrice(request.getPrice());
         coffee.setOrderable(request.getOrderable());
         coffee.setIsDecaff(request.getIsDecaff());
-        return coffee;
     }
 }

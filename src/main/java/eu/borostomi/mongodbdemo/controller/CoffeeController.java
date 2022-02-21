@@ -1,11 +1,9 @@
 package eu.borostomi.mongodbdemo.controller;
 
-import eu.borostomi.mongodbdemo.documents.Coffee;
 import eu.borostomi.mongodbdemo.dto.CoffeeDto;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import eu.borostomi.mongodbdemo.service.CoffeeService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -22,28 +20,32 @@ public class CoffeeController {
 
     private final CoffeeService coffeeService;
 
-    public CoffeeController(CoffeeService coffeeService) {
+    public CoffeeController(final CoffeeService coffeeService) {
         this.coffeeService = coffeeService;
     }
 
     @GetMapping(path = "/coffee-details/{coffeeName}")
-    public ResponseEntity<CoffeeDto> getCoffeeDetails(@PathVariable String coffeeName, @CookieValue(name = "measurement", required = false) String measurement) {
+    public ResponseEntity<CoffeeDto> getCoffeeDetails(
+            @PathVariable final String coffeeName,
+            @CookieValue(name = "measurement", required = false) final String measurement) {
         return coffeeService.getCoffeeByName(coffeeName, measurement);
     }
 
     @PostMapping(path = "/coffee-details/create", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CoffeeDto> createCoffee(@RequestBody BaseCoffeeRequest request) {
+    public ResponseEntity<CoffeeDto> createCoffee(@RequestBody final BaseCoffeeRequest request) {
         return coffeeService.createCoffee(request);
     }
 
     @PutMapping(path = "/coffee-details/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CoffeeDto> updateCoffee(@PathVariable String coffeeId, @RequestBody CoffeeRequestWithId request) {
+    public ResponseEntity<CoffeeDto> updateCoffee(
+            @PathVariable final String coffeeId,
+            @RequestBody final CoffeeRequestWithId request) {
         coffeeService.updateCoffee(request, coffeeId);
         return null;
     }
 
     @DeleteMapping(path = "/coffee-details/{coffeeId}")
-    public ResponseEntity<String> deleteCoffee(@PathVariable String coffeeId) {
+    public ResponseEntity<String> deleteCoffee(@PathVariable final String coffeeId) {
         return coffeeService.deleteCoffee(coffeeId);
     }
 }
