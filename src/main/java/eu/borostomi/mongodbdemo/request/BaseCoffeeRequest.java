@@ -1,6 +1,5 @@
 package eu.borostomi.mongodbdemo.request;
 
-import eu.borostomi.mongodbdemo.dto.RecipesDto;
 import eu.borostomi.mongodbdemo.model.ShortRecipe;
 import lombok.Data;
 import lombok.NoArgsConstructor;

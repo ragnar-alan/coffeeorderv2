@@ -1,11 +1,9 @@
 package eu.borostomi.mongodbdemo.controller;
 
-import eu.borostomi.mongodbdemo.documents.Coffee;
 import eu.borostomi.mongodbdemo.dto.CoffeeDto;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import eu.borostomi.mongodbdemo.service.CoffeeService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
