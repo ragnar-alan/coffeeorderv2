@@ -6,12 +6,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RecipeTransformator {
-    public RecipeDto convertEntityToDto(Recipe recipe) {
+    private final UnitConverterUtility unitConverterUtility;
+
+    public RecipeTransformator(final UnitConverterUtility unitConverterUtility) {
+        this.unitConverterUtility = unitConverterUtility;
+    }
+
+    public RecipeDto convertEntityToDto(final Recipe recipe, final String measurement) {
         RecipeDto recipeDto = new RecipeDto();
         recipeDto.setId(recipe.getId());
         recipeDto.setName(recipe.getName());
         recipeDto.setDifficulty(recipe.getDifficulty());
-        recipeDto.setIngredients(recipe.getIngredients());
+        recipeDto.setIngredients(unitConverterUtility.convertIngredients(recipe.getIngredients(), measurement));
         recipeDto.setMaterials(recipe.getMaterials());
         recipeDto.setSteps(recipe.getSteps());
         recipeDto.setPrepTime(recipe.getPrepTime());
