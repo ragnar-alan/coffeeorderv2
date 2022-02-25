@@ -79,4 +79,20 @@ public class RecipeService {
         }
         return responseEntityResult;
     }
+
+    public ResponseEntity<RecipeDto> deleteRecipe(final String recipeId) {
+        ResponseEntity<RecipeDto> responseEntityResult;
+        try {
+            Optional<Recipe> recipe = recipeRepository.findById(recipeId);
+            if (recipe.isPresent()) {
+                recipeRepository.delete(recipe.get());
+                responseEntityResult = ResponseEntity.noContent().build();
+            } else {
+                responseEntityResult = ResponseEntity.notFound().build();
+            }
+        } catch (Exception ex) {
+            responseEntityResult = ResponseEntity.badRequest().build();
+        }
+        return responseEntityResult;
+    }
 }

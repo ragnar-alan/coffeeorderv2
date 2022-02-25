@@ -7,6 +7,7 @@ import eu.borostomi.mongodbdemo.service.RecipeService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,5 +49,10 @@ public class RecipeController {
             @PathVariable final  String recipeId,
             @CookieValue(name = "measurement", required = false)final  String measurement) {
         return recipeService.updateRecipe(request, recipeId, measurement);
+    }
+
+    @DeleteMapping(path = "/recipe-details/delete/{recipeId}")
+    public ResponseEntity<RecipeDto> deleteRecipe(@PathVariable final String recipeId) {
+        return recipeService.deleteRecipe(recipeId);
     }
 }

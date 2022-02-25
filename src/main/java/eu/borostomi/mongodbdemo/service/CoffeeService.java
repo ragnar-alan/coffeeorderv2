@@ -23,10 +23,6 @@ import java.util.Optional;
 @Service
 @SuppressWarnings("HiddenFieldCheck")
 public class CoffeeService {
-
-    private static final String COFFEE_NOT_EXIST_DELETE = "The coffee you want to delete is not exist. Coffee id: ";
-    private static final String CANNOT_DELETE_COFFEE = "Cannot delete coffee:";
-    private static final String COFFEE_DELETED = "Coffee deleted";
     private final CoffeeRepository coffeeRepository;
     private final RecipeRepository recipeRepository;
     private final CoffeeTransformator coffeeTransformator;
@@ -92,11 +88,25 @@ public class CoffeeService {
     @Transactional
     public ResponseEntity<String> deleteCoffee(final String coffeeId) {
         Coffee coffee = getCoffeeById(coffeeId);
-        if (coffee == null) {
-            return new ResponseEntity<>(COFFEE_NOT_EXIST_DELETE + coffeeId, HttpStatus.NOT_FOUND);
+        ResponseEntity<String> responseEntityResult;
+        if (coffee != null) {
+            coffee.setOrderable(false);
+            DeletedCoffee deletedCoffee = buildDeletedCoffee(coffee);
+            try {
+                deletedCoffeeRepository.save(deletedCoffee);
+                coffeeRepository.deleteById(coffeeId);
+                responseEntityResult = ResponseEntity.noContent().build();
+            } catch (Exception e) {
+                responseEntityResult = ResponseEntity.badRequest().build();
+            }
+        } else {
+            responseEntityResult = ResponseEntity.notFound().build();
         }
-        coffee.setOrderable(false);
-        DeletedCoffee deletedCoffee = new DeletedCoffeeBuilder()
+        return responseEntityResult;
+    }
+
+    private DeletedCoffee buildDeletedCoffee(Coffee coffee) {
+        return new DeletedCoffeeBuilder()
                 .setId(coffee.getId())
                 .setName(coffee.getName())
                 .setAromaProfile(coffee.getAromaProfile())
@@ -109,17 +119,6 @@ public class CoffeeService {
                 .setOrderable(coffee.getOrderable())
                 .setIsDecaff(coffee.getIsDecaff())
                 .build();
-        ResponseEntity<String> result;
-        try {
-            deletedCoffeeRepository.save(deletedCoffee);
-            coffeeRepository.deleteById(coffeeId);
-            result = new ResponseEntity<>(COFFEE_DELETED, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            result = new ResponseEntity<>(CANNOT_DELETE_COFFEE
-                    + coffee.getName()
-                    + " " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        return result;
     }
 
     private Boolean isCoffeeExistsByName(final BaseCoffeeRequest request, final Coffee convertedRequest) {
