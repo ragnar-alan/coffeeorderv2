@@ -25,7 +25,7 @@ public class CoffeeController {
     }
 
     @GetMapping(path = "/coffee-details/{coffeeName}")
-    public ResponseEntity<CoffeeDto> getCoffee(
+    public ResponseEntity<CoffeeDto> getCoffeeDetails(
             @PathVariable final String coffeeName,
             @CookieValue(name = "measurement", required = false) final String measurement) {
         return coffeeService.getCoffeeByName(coffeeName, measurement);
@@ -36,7 +36,7 @@ public class CoffeeController {
         return coffeeService.createCoffee(request);
     }
 
-    @PutMapping(path = "/coffee-details/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/coffee-details/update/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CoffeeDto> updateCoffee(
             @PathVariable final String coffeeId,
             @RequestBody final CoffeeRequestWithId request) {

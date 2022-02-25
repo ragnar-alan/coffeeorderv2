@@ -1,29 +1,22 @@
 package eu.borostomi.mongodbdemo.transformator;
 
 import eu.borostomi.mongodbdemo.documents.Coffee;
-import eu.borostomi.mongodbdemo.documents.Ingredient;
 import eu.borostomi.mongodbdemo.documents.Recipe;
 import eu.borostomi.mongodbdemo.dto.CoffeeDto;
-import eu.borostomi.mongodbdemo.dto.IngredientDto;
-import eu.borostomi.mongodbdemo.dto.RecipesDto;
+import eu.borostomi.mongodbdemo.dto.RecipeDto;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class CoffeeTransformator {
 
-    public static final String IMPERIAL = "imperial";
-    private final ConverterProvider converterProvider;
+    private final UnitConverterUtility unitConverterUtility;
 
-    public CoffeeTransformator(final ConverterProvider converterProvider) {
-        this.converterProvider = converterProvider;
+    public CoffeeTransformator(final UnitConverterUtility unitConverterUtility) {
+        this.unitConverterUtility = unitConverterUtility;
     }
 
     public CoffeeDto convertCoffeeToDto(final Coffee coffee, final Recipe recipe, final String measurement) {
@@ -45,37 +38,19 @@ public class CoffeeTransformator {
         return dto;
     }
 
-    private RecipesDto convertRecipes(final Recipe recipe, final String measurement) {
+    private RecipeDto convertRecipes(final Recipe recipe, final String measurement) {
         if (recipe == null) {
             return null;
         }
-        RecipesDto dto = new RecipesDto();
+        RecipeDto dto = new RecipeDto();
         dto.setName(recipe.getName());
         dto.setPrepTime(recipe.getPrepTime());
         dto.setPrepUnit(recipe.getPrepUnit());
         dto.setDifficulty(recipe.getDifficulty());
         dto.setMaterials(recipe.getMaterials());
-        dto.setIngredients(convertIngredients(recipe.getIngredients(), measurement));
+        dto.setIngredients(unitConverterUtility.convertIngredients(recipe.getIngredients(), measurement));
         dto.setSteps(recipe.getSteps());
         return dto;
-    }
-
-    private List<IngredientDto> convertIngredients(final List<Ingredient> ingredients, final String measurement) {
-        return ingredients.stream().filter(Objects::nonNull).map(ingredient -> {
-            IngredientDto dto = new IngredientDto();
-            dto.setName(ingredient.getName());
-            UnitConverter transformator = converterProvider.getTransformator(ingredient.getUnit());
-            if (measurement.equals(IMPERIAL)) {
-                dto.setAmount(transformator.convert(ingredient.getAmount()));
-                dto.setUnit(transformator.convertUnit(ingredient.getUnit()));
-            } else {
-                dto.setAmount(BigDecimal.valueOf(ingredient.getAmount()).setScale(2, RoundingMode.HALF_UP));
-                dto.setUnit(ingredient.getUnit());
-            }
-
-            dto.setIsReplaceable(ingredient.getReplaceable());
-            return dto;
-        }).collect(Collectors.toList());
     }
 
     public Coffee convertRequestToEntity(final BaseCoffeeRequest request, final Coffee coffee) {
@@ -84,7 +59,6 @@ public class CoffeeTransformator {
     }
 
     public Coffee convertUpdateRequestToEntity(final CoffeeRequestWithId request, final Coffee coffee) {
-        coffee.setId(request.getId());
         setCoffeeFields(request, coffee);
         return coffee;
     }

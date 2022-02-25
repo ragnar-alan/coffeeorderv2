@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -23,10 +24,6 @@ import java.util.Optional;
 @Service
 @SuppressWarnings("HiddenFieldCheck")
 public class CoffeeService {
-
-    private static final String COFFEE_NOT_EXIST_DELETE = "The coffee you want to delete is not exist. Coffee id: ";
-    private static final String CANNOT_DELETE_COFFEE = "Cannot delete coffee:";
-    private static final String COFFEE_DELETED = "Coffee deleted";
     private final CoffeeRepository coffeeRepository;
     private final RecipeRepository recipeRepository;
     private final CoffeeTransformator coffeeTransformator;
@@ -71,6 +68,7 @@ public class CoffeeService {
     }
 
     public ResponseEntity<CoffeeDto> updateCoffee(final CoffeeRequestWithId request, final String coffeeId) {
+        ResponseEntity<CoffeeDto> responseEntityResult;
         Coffee coffeeExists = isCoffeeExistsById(coffeeId);
         if (coffeeExists != null) {
             try {
@@ -78,22 +76,38 @@ public class CoffeeService {
                 Recipe recipe = getRecipe(convertedUpdateRequest);
                 CoffeeDto result = coffeeTransformator.convertCoffeeToDto(
                         coffeeRepository.save(convertedUpdateRequest), recipe, null);
-                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                responseEntityResult = ResponseEntity.ok(result);
+            } catch (Exception ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
             }
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            responseEntityResult = ResponseEntity.notFound().build();
         }
+        return responseEntityResult;
     }
 
     @Transactional
     public ResponseEntity<String> deleteCoffee(final String coffeeId) {
         Coffee coffee = getCoffeeById(coffeeId);
-        if (coffee == null) {
-            return new ResponseEntity<>(COFFEE_NOT_EXIST_DELETE + coffeeId, HttpStatus.NOT_FOUND);
+        ResponseEntity<String> responseEntityResult;
+        if (coffee != null) {
+            coffee.setOrderable(false);
+            DeletedCoffee deletedCoffee = buildDeletedCoffee(coffee);
+            try {
+                deletedCoffeeRepository.save(deletedCoffee);
+                coffeeRepository.deleteById(coffeeId);
+                responseEntityResult = ResponseEntity.noContent().build();
+            } catch (Exception ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+            }
+        } else {
+            responseEntityResult = ResponseEntity.notFound().build();
         }
-        DeletedCoffee deletedCoffee = new DeletedCoffeeBuilder()
+        return responseEntityResult;
+    }
+
+    private DeletedCoffee buildDeletedCoffee(final Coffee coffee) {
+        return new DeletedCoffeeBuilder()
                 .setId(coffee.getId())
                 .setName(coffee.getName())
                 .setAromaProfile(coffee.getAromaProfile())
@@ -106,18 +120,6 @@ public class CoffeeService {
                 .setOrderable(coffee.getOrderable())
                 .setIsDecaff(coffee.getIsDecaff())
                 .build();
-        coffee.setOrderable(false);
-        ResponseEntity<String> result;
-        try {
-            deletedCoffeeRepository.save(deletedCoffee);
-            coffeeRepository.deleteById(coffeeId);
-            result = new ResponseEntity<>(COFFEE_DELETED, HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            result = new ResponseEntity<>(CANNOT_DELETE_COFFEE
-                    + coffee.getName()
-                    + " " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        return result;
     }
 
     private Boolean isCoffeeExistsByName(final BaseCoffeeRequest request, final Coffee convertedRequest) {
@@ -136,7 +138,7 @@ public class CoffeeService {
     private Recipe getRecipe(final Coffee coffee) {
         Recipe recipe;
         if (!coffee.getRecipes().isEmpty()) {
-            recipe = recipeRepository.findRecipeByName(
+            recipe = recipeRepository.findByName(
                     coffee.getRecipes().stream()
                             .filter(Objects::nonNull)
                             .map(ShortRecipe::getName)

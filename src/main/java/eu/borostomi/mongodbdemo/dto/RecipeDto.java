@@ -1,25 +1,22 @@
-package eu.borostomi.mongodbdemo.documents;
+package eu.borostomi.mongodbdemo.dto;
 
-
+import eu.borostomi.mongodbdemo.documents.Step;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.ToString;
 
 import java.util.List;
 
-@Document("recipes")
 @Data
 @NoArgsConstructor
-public class Recipe {
-
-    @Id
+@ToString
+public class RecipeDto {
     private String id;
     private String name;
     private Integer prepTime;
     private String prepUnit;
     private String difficulty;
-    private List<Step> steps;
-    private List<Ingredient> ingredients;
     private List<String> materials;
+    private List<IngredientDto> ingredients;
+    private List<Step> steps;
 }

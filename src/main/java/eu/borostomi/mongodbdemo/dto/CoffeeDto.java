@@ -21,7 +21,7 @@ public class CoffeeDto {
     private String aromaNotes;
     private List<String> cupSize;
     private Integer tasteIntensity;
-    private RecipesDto recipe;
+    private RecipeDto recipe;
     private Boolean isCollection;
     private BigDecimal price;
     private Boolean isOrderable;
