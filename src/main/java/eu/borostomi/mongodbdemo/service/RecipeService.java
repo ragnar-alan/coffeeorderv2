@@ -31,8 +31,8 @@ public class RecipeService {
         Recipe recipe;
         try {
             recipe = recipeRepository.findByName(recipeName);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
         return ResponseEntity.ok(recipeTransformator.convertEntityToDto(recipe, measurement));
     }
@@ -55,7 +55,7 @@ public class RecipeService {
             RecipeDto dtoResult = recipeTransformator.convertEntityToDto(recipeResult, METRIC);
             return ResponseEntity.ok(dtoResult);
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().build();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
     }
 
@@ -71,8 +71,8 @@ public class RecipeService {
                 RecipeDto result =
                         recipeTransformator.convertEntityToDto(recipeRepository.save(convertedRequest), measurement);
                 responseEntityResult = ResponseEntity.ok(result);
-            } catch (Exception e) {
-                responseEntityResult = ResponseEntity.badRequest().build();
+            } catch (Exception ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
             }
         } else {
             responseEntityResult = ResponseEntity.notFound().build();
@@ -91,7 +91,7 @@ public class RecipeService {
                 responseEntityResult = ResponseEntity.notFound().build();
             }
         } catch (Exception ex) {
-            responseEntityResult = ResponseEntity.badRequest().build();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
         return responseEntityResult;
     }

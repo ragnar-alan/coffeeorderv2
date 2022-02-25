@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -76,8 +77,8 @@ public class CoffeeService {
                 CoffeeDto result = coffeeTransformator.convertCoffeeToDto(
                         coffeeRepository.save(convertedUpdateRequest), recipe, null);
                 responseEntityResult = ResponseEntity.ok(result);
-            } catch (Exception e) {
-                responseEntityResult = ResponseEntity.badRequest().build();
+            } catch (Exception ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
             }
         } else {
             responseEntityResult = ResponseEntity.notFound().build();
@@ -96,8 +97,8 @@ public class CoffeeService {
                 deletedCoffeeRepository.save(deletedCoffee);
                 coffeeRepository.deleteById(coffeeId);
                 responseEntityResult = ResponseEntity.noContent().build();
-            } catch (Exception e) {
-                responseEntityResult = ResponseEntity.badRequest().build();
+            } catch (Exception ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
             }
         } else {
             responseEntityResult = ResponseEntity.notFound().build();
