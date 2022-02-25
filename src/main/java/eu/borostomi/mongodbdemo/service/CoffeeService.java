@@ -106,7 +106,7 @@ public class CoffeeService {
         return responseEntityResult;
     }
 
-    private DeletedCoffee buildDeletedCoffee(Coffee coffee) {
+    private DeletedCoffee buildDeletedCoffee(final Coffee coffee) {
         return new DeletedCoffeeBuilder()
                 .setId(coffee.getId())
                 .setName(coffee.getName())
