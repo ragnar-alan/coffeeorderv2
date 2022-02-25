@@ -36,4 +36,26 @@ public class UnitConverterUtility {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public List<Ingredient> convertIngredientsDtoToEntity(
+            final List<IngredientDto> ingredients,
+            final String measurement) {
+        return ingredients.stream().filter(Objects::nonNull).map(ingredient -> {
+            Ingredient dto = new Ingredient();
+            dto.setName(ingredient.getName());
+            UnitConverter transformator = converterProvider.getTransformator(ingredient.getUnit());
+            if (measurement.equals(IMPERIAL)) {
+                dto.setAmount(transformator.convert(ingredient.getAmount().doubleValue()).doubleValue());
+                dto.setUnit(transformator.convertUnit(ingredient.getUnit()));
+            } else {
+                dto.setAmount(BigDecimal.valueOf(
+                        ingredient.getAmount().doubleValue())
+                        .setScale(2, RoundingMode.HALF_UP).doubleValue());
+                dto.setUnit(ingredient.getUnit());
+            }
+
+            dto.setReplaceable(ingredient.getIsReplaceable());
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

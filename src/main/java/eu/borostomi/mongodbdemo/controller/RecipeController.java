@@ -2,12 +2,15 @@ package eu.borostomi.mongodbdemo.controller;
 
 import eu.borostomi.mongodbdemo.dto.RecipeDto;
 import eu.borostomi.mongodbdemo.request.BaseRecipeRequest;
+import eu.borostomi.mongodbdemo.request.RecipeRequest;
 import eu.borostomi.mongodbdemo.service.RecipeService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +40,13 @@ public class RecipeController {
     @PostMapping(path = "/recipe-details/create")
     public ResponseEntity<RecipeDto> createRecipe(@RequestBody final BaseRecipeRequest request) {
         return recipeService.createRecipe(request);
+    }
+
+    @PutMapping(path = "/recipe-detauls/update/{recipeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RecipeDto> updateRecipe(
+            @RequestBody final RecipeRequest request,
+            @PathVariable final  String recipeId,
+            @CookieValue(name = "measurement", required = false)final  String measurement) {
+        return recipeService.updateRecipe(request, recipeId, measurement);
     }
 }

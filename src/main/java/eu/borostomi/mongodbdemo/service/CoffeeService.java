@@ -71,6 +71,7 @@ public class CoffeeService {
     }
 
     public ResponseEntity<CoffeeDto> updateCoffee(final CoffeeRequestWithId request, final String coffeeId) {
+        ResponseEntity<CoffeeDto> responseEntityResult;
         Coffee coffeeExists = isCoffeeExistsById(coffeeId);
         if (coffeeExists != null) {
             try {
@@ -78,13 +79,14 @@ public class CoffeeService {
                 Recipe recipe = getRecipe(convertedUpdateRequest);
                 CoffeeDto result = coffeeTransformator.convertCoffeeToDto(
                         coffeeRepository.save(convertedUpdateRequest), recipe, null);
-                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+                responseEntityResult = ResponseEntity.ok(result);
             } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                responseEntityResult = ResponseEntity.badRequest().build();
             }
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            responseEntityResult = ResponseEntity.notFound().build();
         }
+        return responseEntityResult;
     }
 
     @Transactional

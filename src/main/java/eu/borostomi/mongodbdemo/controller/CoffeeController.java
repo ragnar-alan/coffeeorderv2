@@ -36,7 +36,7 @@ public class CoffeeController {
         return coffeeService.createCoffee(request);
     }
 
-    @PutMapping(path = "/coffee-details/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/coffee-details/update/{coffeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CoffeeDto> updateCoffee(
             @PathVariable final String coffeeId,
             @RequestBody final CoffeeRequestWithId request) {

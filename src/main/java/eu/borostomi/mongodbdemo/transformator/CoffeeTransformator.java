@@ -59,7 +59,6 @@ public class CoffeeTransformator {
     }
 
     public Coffee convertUpdateRequestToEntity(final CoffeeRequestWithId request, final Coffee coffee) {
-        coffee.setId(request.getId());
         setCoffeeFields(request, coffee);
         return coffee;
     }
