@@ -1,0 +1,100 @@
+{
+	"info": {
+		"_postman_id": "a1231f69-7e2f-445a-982e-ce249667bb8c",
+		"name": "mongo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2963399"
+	},
+	"item": [
+		{
+			"name": "getCoffeeDetails",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/coffee-details/Cosi",
+					"host": [
+						"localhostűűűűűűűűűűűűűűűűűűűűűűűűűűűűűűűűűű"
+					],
+					"path": [
+						"coffee-details",
+						"Cosi"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateCoffee",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"name\":\"Ristretto Italiano15654\",\r\n\t\"aromaProfile\":\"Intense\",\r\n\t\"aromaNotes\": \"Intensely roasted\",\r\n\t\"cupSize\":[\r\n\t\t\"Ristretto\",\r\n\t\t\"Espresso\",\r\n\t\t\"Americano\"\r\n\t\t],\r\n\t\"tasteIntensity\":10,\r\n\t\"recipes\":[\r\n\t\t{\r\n\t\t\t\"name\":\"Nespresso Martini\",\r\n\t\t\t\"prepTime\": 5,\r\n\t\t\t\"prepUnit\": \"min\",\r\n\t\t\t\"difficulty\": \"Medium\"\r\n\t\t}\r\n\t],\r\n\t\"isCollection\": false,\r\n\t\"price\": 1450,\r\n\t\"isOrderable\":true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/coffee-details/create",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"coffee-details",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateCreateCoffee",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"_id\": \"620d12d3d16d4d2fa1cc7e65\",\r\n  \"name\": \"Ristretto Italiano222\",\r\n  \"aromaProfile\": \"Intense\",\r\n  \"aromaNotes\": \"Intensely roasted\",\r\n  \"cupSize\": [\r\n    \"Ristretto\",\r\n    \"Espresso\",\r\n    \"Americano\"\r\n  ],\r\n  \"tasteIntensity\": 10,\r\n  \"recipes\": [\r\n    {\r\n      \"name\": \"Nespresso Martini\",\r\n      \"prepTime\": 5,\r\n      \"prepUnit\": \"min\",\r\n      \"difficulty\": \"Medium\"\r\n    }\r\n  ],\r\n  \"collection\": false,\r\n  \"price\": 1350,\r\n  \"orderable\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/coffee-details/620d12d3d16d4d2fa1cc7e65",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"coffee-details",
+						"620d12d3d16d4d2fa1cc7e65"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost/coffee-details/620d23a39d59de6ceb1c5fc4",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"coffee-details",
+						"620d23a39d59de6ceb1c5fc4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
