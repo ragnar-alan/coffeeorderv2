@@ -45,6 +45,24 @@ public class CoffeeTransformator {
         return dto;
     }
 
+    public CoffeeDto convertCoffeeToDtoWWithoutRecipe(final Coffee coffee) {
+        if (coffee == null) {
+            return null;
+        }
+        CoffeeDto dto = new CoffeeDto();
+        dto.setId(coffee.getId());
+        dto.setName(coffee.getName());
+        dto.setAromaProfile(coffee.getAromaProfile());
+        dto.setAromaNotes(coffee.getAromaNotes());
+        dto.setCupSize(coffee.getCupSize());
+        dto.setTasteIntensity(coffee.getTasteIntensity());
+        dto.setIsCollection(coffee.getCollection());
+        dto.setPrice(coffee.getPrice());
+        dto.setIsOrderable(coffee.getOrderable());
+        dto.setIsDecaff(coffee.getIsDecaff());
+        return dto;
+    }
+
     private RecipesDto convertRecipes(final Recipe recipe, final String measurement) {
         if (recipe == null) {
             return null;
@@ -75,7 +93,7 @@ public class CoffeeTransformator {
 
             dto.setIsReplaceable(ingredient.getReplaceable());
             return dto;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     public Coffee convertRequestToEntity(final BaseCoffeeRequest request, final Coffee coffee) {
@@ -87,6 +105,10 @@ public class CoffeeTransformator {
         coffee.setId(request.getId());
         setCoffeeFields(request, coffee);
         return coffee;
+    }
+
+    public List<CoffeeDto> convertAllCoffeeToDto(List<Coffee> results) {
+        return results.stream().map(this::convertCoffeeToDtoWWithoutRecipe).toList();
     }
 
     private void setCoffeeFields(final BaseCoffeeRequest request, final Coffee coffee) {

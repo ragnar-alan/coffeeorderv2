@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class CoffeeController {
 
@@ -29,6 +31,11 @@ public class CoffeeController {
             @PathVariable final String coffeeName,
             @CookieValue(name = "measurement", required = false) final String measurement) {
         return coffeeService.getCoffeeByName(coffeeName, measurement);
+    }
+
+    @GetMapping(path = "coffees")
+    public ResponseEntity<List<CoffeeDto>> getAllCoffee() {
+        return coffeeService.getAllCoffee();
     }
 
     @PostMapping(path = "/coffee-details/create", consumes = MediaType.APPLICATION_JSON_VALUE)

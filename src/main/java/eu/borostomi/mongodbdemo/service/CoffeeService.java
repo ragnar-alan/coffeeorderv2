@@ -12,25 +12,35 @@ import eu.borostomi.mongodbdemo.repository.RecipeRepository;
 import eu.borostomi.mongodbdemo.request.BaseCoffeeRequest;
 import eu.borostomi.mongodbdemo.request.CoffeeRequestWithId;
 import eu.borostomi.mongodbdemo.transformator.CoffeeTransformator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @SuppressWarnings("HiddenFieldCheck")
+@Slf4j
 public class CoffeeService {
-
     private static final String COFFEE_NOT_EXIST_DELETE = "The coffee you want to delete is not exist. Coffee id: ";
     private static final String CANNOT_DELETE_COFFEE = "Cannot delete coffee:";
     private static final String COFFEE_DELETED = "Coffee deleted";
+
     private final CoffeeRepository coffeeRepository;
     private final RecipeRepository recipeRepository;
     private final CoffeeTransformator coffeeTransformator;
     private final DeletedCoffeeRepository deletedCoffeeRepository;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     public CoffeeService(final CoffeeRepository coffeeRepository,
                          final CoffeeTransformator coffeeTransformator,
@@ -42,6 +52,7 @@ public class CoffeeService {
         this.deletedCoffeeRepository = deletedCoffeeRepository;
     }
 
+    @Cacheable(value="coffeeCache")
     public ResponseEntity<CoffeeDto> getCoffeeByName(final String name, final String measurement) {
         Coffee coffee = coffeeRepository.findByName(name);
         Recipe recipe = getRecipe(coffee);
@@ -51,6 +62,12 @@ public class CoffeeService {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Cacheable(value="coffeeCache")
+    public ResponseEntity<List<CoffeeDto>> getAllCoffee() {
+        List<Coffee> results = coffeeRepository.findAll();
+        return new ResponseEntity<>(coffeeTransformator.convertAllCoffeeToDto(results), HttpStatus.OK);
     }
 
     public Coffee getCoffeeById(final String id) {
